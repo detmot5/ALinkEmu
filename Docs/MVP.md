@@ -3,8 +3,10 @@
 1. Emulation of AVR CPU to run simple program and 7then to emulate first microcontroller chip - ATmega328p
 	- Emulation of memory and memory addressing system for RAM FLASH AND EEPROM It's worth to mention that the AVR cpu is build based on Harvad architecture and it's little endian
 	- Implementation of basic cpu registers in memory address space 
+
 		![](Img/MemoryMap.png)
 		![](Img/GPWR.png)
+		
 		_Images from ATMega328P datasheet_
 	- Implementing instructions (page 330 of documentation)
 		- Create a clear and universal way to implement instructions
