@@ -12,9 +12,10 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+
 add_library(ALinkEmu ${Sources} ${Headers})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_include_directories(ALinkEmu PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/Src)
+target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
 
 
 enable_testing()
