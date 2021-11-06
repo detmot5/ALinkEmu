@@ -1,0 +1,3 @@
+[submodule "ALinkEmu/Vendor/SpdLog"]
+	path = ALinkEmu/Vendor/SpdLog
+	url = git@github.com:gabime/spdlog.git
