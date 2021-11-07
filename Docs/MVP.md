@@ -31,7 +31,7 @@
 			      ^Rd  ^Rr
 			which will be assembled into following opcode:
 			- 89 1b
-			Which is 0x1b96 (because of little endian architecture)
+			Which is 0x1b89 (because of little endian architecture)
 			In binary it equals
 			0001 1011 1000 1001
 			Where looking from the left side 0001 10 is the part which
