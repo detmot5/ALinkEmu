@@ -10,23 +10,25 @@
 		_Images from ATMega328P datasheet_
 	- Initialization procedure
 	- Reset procedure
-	- Implementation of basic IO registers (PORTx, PINx, DDRx)
+	- Implementation of basic IO modules (Like GPIO, UART, SPI, I2C)
 	- Basic clock implementation
 	- All modules of chip must have unit tests (especially instructions)
 	- Implementing instructions (page 330 of documentation)
 		- Create a clear and universal way to implement instructions
 		- All few hundred instructions need to be implemented
 		- Every instuction MUST HAVE its unit test
-		http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
 		- Instruction has following data: 
 			- An part of opcode which defines particular instrucion
 			- Count of clock cycles it takes
 			- A handling procedure
 		- Instructions and it's parameteres are merged into 16 or 32 bit opcodes which uC decodes in the following way:
+		http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf
+
 		![](Img/SubOpcode.png)
+
 		It may seem unclear by looking on this schematic so I prepared little explanation with example
 		```
-			Lets say we have following code:
+			Let's say we have following code:
 			- sub r24, r25
 			      ^Rd  ^Rr
 			which will be assembled into following opcode:
@@ -113,11 +115,17 @@
 		using Opcode16 = uint16_t;
 		using Opcode32 = uint32_t;
 
+		struct Instruction16BitWithTwoArgs {
+			uint8_t instructionOpcode : 6;
+			uint8_t sourceRegister : 5;
+			uint8_t destinationRegister : 5;
+		}
 
-		Instruction ATmega328p::DecodeInstruction(Opcode16 opcode) {
+		BasicInstruction ATmega328p::DecodeInstruction(Opcode16 opcode) {
 			uint8_t instruction = (opcode >> 9);
-
+		
 		}
 
 	```
+	https://www.avrfreaks.net/forum/why-shorthand-instructions-lsr-rol-tst-and
 
