@@ -31,4 +31,20 @@ target_link_libraries(
 include(GoogleTest)
 gtest_discover_tests(test)
 
-add_subdirectory(Vendor/SpdLog)
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.x
+)
+
+FetchContent_GetProperties(spdlog)
+if (NOT spdlog_POPULATED)
+    FetchContent_Populate(spdlog)
+    add_subdirectory(${spdlog_SOURCE_DIR} ${spdlog_BINARY_DIR})
+endif ()
+
+add_executable(
+        testSpdlog
+        Test/SpdLog.cpp
+)
+target_link_libraries(testSpdlog gmock_main spdlog::spdlog)
