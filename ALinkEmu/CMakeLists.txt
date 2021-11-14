@@ -12,11 +12,18 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+FetchContent_Declare(
+        spdlog
+        GIT_REPOSITORY https://github.com/gabime/spdlog.git
+        GIT_TAG        v1.x
+)
+
+FetchContent_MakeAvailable(spdlog)
 
 add_library(ALinkEmu ${Sources} ${Headers})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
-
+target_link_libraries(ALinkEmu PUBLIC spdlog::spdlog)
 
 enable_testing()
 
@@ -31,3 +38,5 @@ target_link_libraries(
 
 include(GoogleTest)
 gtest_discover_tests(test)
+
+
