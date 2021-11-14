@@ -20,7 +20,6 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(spdlog)
 
-
 add_library(ALinkEmu ${Sources} ${Headers})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
