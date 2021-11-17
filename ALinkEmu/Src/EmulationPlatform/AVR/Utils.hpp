@@ -12,7 +12,7 @@ using FlashAddress = uint32_t;
 
 struct RegisterBitLocation {
   RamAddress address;
-  uint8_t offset
+  uint8_t offset;
 };
 
 }
