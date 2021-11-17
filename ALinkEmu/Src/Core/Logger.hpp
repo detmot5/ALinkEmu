@@ -10,16 +10,18 @@
 
 class Logger {
  public:
-  static inline void Init(std::string_view d, const std::string& a) {
+  static inline void Init() {
     spdlog::set_pattern("%^[%d-%m-%Y %H:%M:%S] [%n-%l] [Thread - %t] - %v%$");
     emuLogger = spdlog::stdout_color_mt("EMU");
     emuLogger->set_level(spdlog::level::trace);
     clientLogger = spdlog::stdout_color_mt("ClientApp");
     clientLogger->set_level(spdlog::level::trace);
   }
+
   static inline std::shared_ptr<spdlog::logger>& GetEmuLogger() {
     return emuLogger;
   }
+
   static inline std::shared_ptr<spdlog::logger>& GetClientLogger() {
     return clientLogger;
   }
