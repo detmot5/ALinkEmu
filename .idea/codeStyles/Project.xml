@@ -25,7 +25,7 @@
         <option name="com.jetbrains.cidr.lang.util.OCDeclarationKind" value="Function" />
       </file>
       <extensions>
-        <pair source="cpp" header="hpp" fileNamingConvention="PASCAL_CASE" />
+        <pair source="cpp" header="hpp" fileNamingConvention="NONE" />
         <pair source="c" header="h" fileNamingConvention="NONE" />
         <pair source="cu" header="cuh" fileNamingConvention="NONE" />
       </extensions>

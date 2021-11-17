@@ -7,3 +7,4 @@
 
 
 #include "Src/EmulationPlatform/AVR/ATmega328p/ATMega328p.hpp"
+#include "Src/Core/Logger.hpp"
