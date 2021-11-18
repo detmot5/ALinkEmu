@@ -3,8 +3,8 @@
 //
 #pragma once
 
-#include "Src/Core/BaseChip.hpp"
 
 
-#include "Src/EmulationPlatform/AVR/ATmega328p/ATMega328p.hpp"
-#include "Src/Core/Logger.hpp"
+#include "Src/Base/Logger.hpp"
+#include "Src/EmulationPlatform/AVR/Core/Core.hpp"
+
