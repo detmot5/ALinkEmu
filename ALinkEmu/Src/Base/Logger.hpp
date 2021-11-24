@@ -11,7 +11,7 @@
 class Logger {
  public:
   static inline void Init() {
-    spdlog::set_pattern("%^[%d-%m-%Y %H:%M:%S] [%n-%l] [Thread - %t] - %v%$");
+    spdlog::set_pattern("%^[%d-%m-%Y %H:%M:%S] [%n-%l] [Thread - %t] %v%$");
     emuLogger = spdlog::stdout_color_mt("EMU");
     emuLogger->set_level(spdlog::level::trace);
     clientLogger = spdlog::stdout_color_mt("ClientApp");
