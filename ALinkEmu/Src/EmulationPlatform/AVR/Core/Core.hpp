@@ -19,7 +19,6 @@ enum class CpuState {
 
 class Core {
   friend class InstructionExecutor;
-
  public:
   void Init();
   void Reset();
@@ -35,6 +34,8 @@ class Core {
   inline void SetSregFlagValue(SregFlag flag, bool value) {
     this->sregMirror[static_cast<size_t>(flag)] = value;
   }
+
+  std::string DumpCoreData();
 
  private:
  private:
@@ -79,7 +80,7 @@ class Core {
     RegisterBitLocation WDRF;
   } MCUSR;
 
-  bool sregMirror[8];
+  bool sregMirror[8] = {0};
 };
 
 }  // namespace ALinkEmu::AVR

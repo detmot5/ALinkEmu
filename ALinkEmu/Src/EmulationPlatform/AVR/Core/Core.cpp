@@ -23,15 +23,14 @@ void Core::Init() {
   this->PC = 0;
 
   this->ram[0] = 10;
-  this->ram[1] = 20;
+  this->ram[1] = 250;
 }
 
 void Core::Reset() {}
 void Core::Shutdown() {}
 void Core::ExecuteSingleInstruction() {
   uint32_t opcode = this->FetchInstruction(this->PC);
-  opcode <<= 8;
-  uint32_t newPC = this->PC + 2;
+  uint32_t newPC = this->PC + 1;
 
   EMU_LOG_WARN("{0}", opcode & 0xFC00);
 
@@ -42,22 +41,40 @@ void Core::ExecuteSingleInstruction() {
           EMU_LOG_WARN("NOP");
         } break;
         default: {
-          switch (opcode & 0xFC00) {
+          switch (opcode & 0xFF00) {
             case 0x0400: {
               this->instructionExecutor.CPC(opcode);
             } break;
             case 0x0C00: {
               this->instructionExecutor.ADD(opcode);
             } break;
+            case 0x0800: {
+              this->instructionExecutor.SBC(opcode);
+            } break;
           }
         }
       }
     }
   }
+  // After instruction, it should synchronize SREG with sregMirror
+
+  this->PC = newPC;
+  EMU_LOG_INFO("Instruction executed. Core dump: \n{0}", this->DumpCoreData());
 }
 
 uint32_t Core::FetchInstruction(FlashAddress currentPC) { return this->flash[PC]; }
 
 void Core::LoadFirmware(uint8_t* data, size_t size) { std::memcpy(this->flash.get(), data, size); }
+
+// Simple way to serialize core registers values (especially SREG) for debugging purposes
+std::string Core::DumpCoreData() {
+  std::string res =
+      fmt::format("SREG: I = {0} T = {1}  H = {2} S = {3} V = {4} N = {5} Z = {6} C = {7}",
+                  this->GetSregFlagValue(SregFlag::I), this->GetSregFlagValue(SregFlag::T),
+                  this->GetSregFlagValue(SregFlag::H), this->GetSregFlagValue(SregFlag::S),
+                  this->GetSregFlagValue(SregFlag::V), this->GetSregFlagValue(SregFlag::N),
+                  this->GetSregFlagValue(SregFlag::Z), this->GetSregFlagValue(SregFlag::C));
+  return res;
+}
 
 }  // namespace ALinkEmu::AVR

@@ -10,7 +10,31 @@ namespace ALinkEmu::AVR {
 
 void InstructionExecutor::CPC(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
 
+  uint8_t carryFlag = this->coreRef->GetSregFlagValue(SregFlag::C);
+
+  uint8_t result = Rd - Rr - carryFlag;
+
+  uint8_t carryFlagsCondition = (~Rd & Rr) | (Rr & result) | (result & ~Rd);
+  uint8_t carry = (carryFlagsCondition >> 7) & 0x01;
+  uint8_t halfCarry = (carryFlagsCondition >> 3) & 0x01;
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, carry);
+  this->coreRef->SetSregFlagValue(SregFlag::H, halfCarry);
+
+  uint8_t previousZeroFlag = this->coreRef->GetSregFlagValue(SregFlag::Z);
+  uint8_t zeroFlag = (~result) & previousZeroFlag;
+  this->coreRef->SetSregFlagValue(SregFlag::Z, zeroFlag);
+
+  uint8_t negativeFlag = (result >> 7) & 0x01;
+  uint8_t twosComplementFlag = (((Rd & ~Rr & ~result) | (~Rd & Rr & result)) >> 7) & 0x01;
+  this->coreRef->SetSregFlagValue(SregFlag::N, negativeFlag);
+  this->coreRef->SetSregFlagValue(SregFlag::V, twosComplementFlag);
+
+  uint8_t signFlag = negativeFlag ^ twosComplementFlag;
+  this->coreRef->SetSregFlagValue(SregFlag::S, signFlag);
 }
 
 void InstructionExecutor::ADD(uint32_t opcode) {
@@ -24,8 +48,8 @@ void InstructionExecutor::ADD(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::N, (result >> 7) & 0x01);
 
   uint8_t carryFlagsCondition = (Rd & Rr) | (Rr & ~result) | (~result & Rd);
-  uint8_t carry = carryFlagsCondition << 7;
-  uint8_t halfCarry = carryFlagsCondition << 3;
+  uint8_t carry = carryFlagsCondition >> 7;
+  uint8_t halfCarry = carryFlagsCondition >> 3;
   this->coreRef->SetSregFlagValue(SregFlag::C, carry & 0x01);
   this->coreRef->SetSregFlagValue(SregFlag::H, halfCarry & 0x01);
 
@@ -41,8 +65,28 @@ void InstructionExecutor::SBC(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
   uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
-  uint8_t result = Rd - Rr;
-  // TODO() SREG flags
+  uint8_t carryFlag = this->coreRef->GetSregFlagValue(SregFlag::C);
+  uint8_t result = Rd - Rr - carryFlag;
+  this->coreRef->SetRegisterValue(RdAddress, result);
+
+  uint8_t carryFlagsCondition = (~Rd & Rr) | (Rr & result) | (result & ~Rd);
+  uint8_t carry = (carryFlagsCondition >> 7) & 0x01;
+  uint8_t halfCarry = (carryFlagsCondition >> 3) & 0x01;
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, carry);
+  this->coreRef->SetSregFlagValue(SregFlag::H, halfCarry);
+
+  uint8_t previousZeroFlag = this->coreRef->GetSregFlagValue(SregFlag::Z);
+  uint8_t zeroFlag = (~result) & previousZeroFlag;
+  this->coreRef->SetSregFlagValue(SregFlag::Z, zeroFlag);
+
+  uint8_t negativeFlag = (result >> 7) & 0x01;
+  uint8_t twosComplementFlag = (((Rd & ~Rr & ~result) | (~Rd & Rr & result)) >> 7) & 0x01;
+  this->coreRef->SetSregFlagValue(SregFlag::N, negativeFlag);
+  this->coreRef->SetSregFlagValue(SregFlag::V, twosComplementFlag);
+
+  uint8_t signFlag = negativeFlag ^ twosComplementFlag;
+  this->coreRef->SetSregFlagValue(SregFlag::S, signFlag);
 
 }
 void InstructionExecutor::AttachCore(Core *coreRef)  {
