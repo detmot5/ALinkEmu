@@ -17,6 +17,25 @@ enum class CpuState {
   CRASHED,
 };
 
+struct PlatformDependentData {
+  // Last address of IO Section
+  uint16_t IOEND;
+  // Last address of RAM
+  uint16_t RAMEND;
+  // Last address of Flash memory
+  uint32_t FLASHEND;
+  // Last Address of EEPROM memory
+  uint32_t E2END;
+  uint16_t RAMPZ;  // optional, only for ELPM/SPM on >64Kb cores
+  uint16_t EIND;   // optional, only for EIJMP/RECALL on >64Kb cores
+  uint8_t vectorSize;
+  uint8_t signature[3];
+  uint8_t fuse[6];
+  uint8_t lockbits;
+  uint8_t addressSize;  // 2, or 3 for cores > 128KB in flash
+};
+
+
 class Core {
   friend class InstructionExecutor;
  public:
@@ -46,28 +65,12 @@ class Core {
   CpuState state;
   // Program Counter
   FlashAddress PC;
-  std::shared_ptr<uint8_t[]> ram;
-  std::shared_ptr<uint16_t[]> flash;
+  std::unique_ptr<uint8_t[]> ram;
+  std::unique_ptr<uint8_t[]> flash;
   uint32_t codeEnd;
   uint32_t frequency;
 
-  struct PlatformDependentData {
-    // Last address of IO Section
-    uint16_t IOEND;
-    // Last address of RAM
-    uint16_t RAMEND;
-    // Last address of Flash memory
-    uint32_t FLASHEND;
-    // Last Address of EEPROM memory
-    uint32_t E2END;
-    uint16_t RAMPZ;  // optional, only for ELPM/SPM on >64Kb cores
-    uint16_t EIND;   // optional, only for EIJMP/RECALL on >64Kb cores
-    uint8_t vectorSize;
-    uint8_t signature[3];
-    uint8_t fuse[6];
-    uint8_t lockbits;
-    uint8_t addressSize;  // 2, or 3 for cores > 128KB in flash
-  } platformDependentData;
+  PlatformDependentData platformDependentData;
 
   struct MicrocontrollerStatusRegister {
     // Power On Reset Flag
@@ -82,5 +85,7 @@ class Core {
 
   bool sregMirror[8] = {0};
 };
+
+
 
 }  // namespace ALinkEmu::AVR
