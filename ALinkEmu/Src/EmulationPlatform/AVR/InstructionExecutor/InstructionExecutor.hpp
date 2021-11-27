@@ -24,6 +24,8 @@ class InstructionExecutor {
   void ADD(uint32_t opcode);
   // Subtract With Carry
   void SBC(uint32_t opcode);
+  // Copy Register Word
+  void MOVW(uint32_t opcode);
 
 
 
