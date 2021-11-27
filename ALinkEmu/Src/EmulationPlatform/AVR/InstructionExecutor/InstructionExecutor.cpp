@@ -2,8 +2,9 @@
 // Created by norbert on 18.11.2021.
 //
 
-#include <elf.h>
 #include "InstructionExecutor.hpp"
+
+#include <elf.h>
 
 #include "EmulationPlatform/AVR/Core/Core.hpp"
 
@@ -69,14 +70,6 @@ void InstructionExecutor::ADD(uint32_t opcode) {
 }
 
 void InstructionExecutor::SBC(uint32_t opcode) {
-
-  FirmwareLoader loader;
-
-  FlashImage f = loader.FromIntelHex()
-  FlashImage e = loader.FromElf().GetFlashImage();
-
-
-
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
   uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
