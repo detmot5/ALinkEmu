@@ -3,20 +3,19 @@
 //
 #pragma once
 #include <cstdint>
+#include <functional>
 #include <utility>
-
 
 #include "Base/Base.hpp"
 #include "EmulationPlatform/AVR/InstructionExecutor/AddressingModeDecoder.hpp"
 
 namespace ALinkEmu::AVR {
 
-
 class Core;
 
 class InstructionExecutor {
  public:
-  void AttachCore(Core* coreRef);
+  explicit InstructionExecutor(Core* coreRef) : coreRef(coreRef) {}
 
   // Compare With Carry
   void CPC(uint32_t opcode);
@@ -26,8 +25,6 @@ class InstructionExecutor {
   void SBC(uint32_t opcode);
   // Copy Register Word
   void MOVW(uint32_t opcode);
-
-
 
  private:
   Core* coreRef;

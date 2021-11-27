@@ -10,12 +10,6 @@
 
 namespace ALinkEmu::AVR {
 
-void InstructionExecutor::AttachCore(Core *coreRef) {
-  if (coreRef == nullptr) EMU_LOG_CRITICAL("NULL");
-  EMU_ASSERT(nullptr != coreRef, "InstructionDecoder receiver nullptr Core instance!");
-  this->coreRef = coreRef;
-}
-
 void InstructionExecutor::CPC(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
