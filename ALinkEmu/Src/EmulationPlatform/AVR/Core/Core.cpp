@@ -17,25 +17,26 @@ void Core::Init() {
   this->platformDependentData.FLASHEND = 32768;
   this->platformDependentData.RAMEND = 2048;
 
-  this->state = CpuState::BEFORE_INIT;
+  this->state = CoreState::BEFORE_INIT;
   this->flash = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.FLASHEND + 4]);
   std::memset(this->flash.get(), 0xFF, this->platformDependentData.FLASHEND + 1);
   this->codeEnd = this->platformDependentData.FLASHEND;
   this->ram = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.RAMEND + 1]);
   std::memset(this->ram.get(), 0x00, this->platformDependentData.RAMEND);
   this->frequency = 10000000;
-  this->instructionExecutor.AttachCore(this);
   this->PC = 0;
 
   this->ram[0] = 10;
   this->ram[1] = 10;
+
+  this->state = CoreState::RUNNING;
 }
 
 void Core::Reset() {}
 void Core::Shutdown() {}
 void Core::ExecuteSingleInstruction() {
   uint32_t opcode = this->FetchInstruction(this->PC);
-  uint32_t newPC = this->PC + 1;
+  uint32_t newPC = this->PC + 2;
 
   switch (opcode & 0xF000) {
     case 0x0000: {
@@ -63,7 +64,9 @@ void Core::ExecuteSingleInstruction() {
           }
         }
       }
-    }
+    } break;
+    default:
+      EMU_LOG_WARN("Invalid opcode: {0:x}", opcode);
   }
   // After instruction, it should synchronize SREG with sregMirror
 

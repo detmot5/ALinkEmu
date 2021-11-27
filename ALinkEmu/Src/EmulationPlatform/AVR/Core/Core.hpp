@@ -10,7 +10,7 @@
 
 namespace ALinkEmu::AVR {
 
-enum class CpuState {
+enum class CoreState {
   BEFORE_INIT,
   RUNNING,
   STOPPED,
@@ -35,10 +35,12 @@ struct PlatformDependentData {
   uint8_t addressSize;  // 2, or 3 for cores > 128KB in flash
 };
 
-
 class Core {
   friend class InstructionExecutor;
+
  public:
+  Core() : instructionExecutor(this) {}
+
   void Init();
   void Reset();
   void Shutdown();
@@ -46,23 +48,22 @@ class Core {
   uint32_t FetchInstruction(FlashAddress currentPC);
   void LoadFirmware(uint8_t* data, size_t size);
 
-
   inline uint8_t GetRegisterValue(RamAddress address) { return this->ram[address]; }
   inline void SetRegisterValue(RamAddress address, uint8_t value) { this->ram[address] = value; }
   inline bool GetSregFlagValue(SregFlag flag) { return this->sregMirror[static_cast<size_t>(flag)]; }
   inline void SetSregFlagValue(SregFlag flag, bool value) {
     this->sregMirror[static_cast<size_t>(flag)] = value;
   }
+  inline CoreState GetCoreState() { return this->state; }
 
   std::string DumpCoreData();
 
- private:
  private:
   InstructionExecutor instructionExecutor;
 
  private:
   std::string name;
-  CpuState state;
+  CoreState state;
   // Program Counter
   FlashAddress PC;
   std::unique_ptr<uint8_t[]> ram;
@@ -81,11 +82,9 @@ class Core {
     RegisterBitLocation BORF;
     // Watchdog System Reset Flag
     RegisterBitLocation WDRF;
-  } MCUSR;
+  } MCUSR{};
 
-  bool sregMirror[8] = {0};
+  bool sregMirror[8] = {false};
 };
-
-
 
 }  // namespace ALinkEmu::AVR
