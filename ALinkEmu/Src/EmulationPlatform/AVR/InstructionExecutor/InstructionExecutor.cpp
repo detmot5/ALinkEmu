@@ -1,10 +1,8 @@
 //
-// Created by norbert on 18.11.2021.
+// Created by Norbert Bielak on 18.11.2021.
 //
 
 #include "InstructionExecutor.hpp"
-
-#include <elf.h>
 
 #include "EmulationPlatform/AVR/Core/Core.hpp"
 
