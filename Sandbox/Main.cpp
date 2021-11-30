@@ -8,7 +8,7 @@
 
 #include "ALinkEmu.hpp"
 
-std::string hexfile = R"("
+std::string hexfile = R"(
 :100000000C9434000C943E000C943E000C943E0082
 :100010000C943E000C943E000C943E000C943E0068
 :100020000C943E000C943E000C943E000C943E0058
@@ -23,8 +23,7 @@ std::string hexfile = R"("
 :1000B000010C010C010C010C010C010C010C010CD8
 :0600C000010CF894FFCFD3
 :00000001FF
-
-")";
+)";
 
 int main(int argc, char* argv[]) {
   QApplication app(argc, argv);
@@ -34,9 +33,16 @@ int main(int argc, char* argv[]) {
   avrCore.Init();
 
   std::istringstream hexFileStream(hexfile);
+  try {
+    ALinkEmu::AVR::FlashImage image = loader.FromHexFile(hexFileStream);
+    avrCore.LoadFirmware(image.data(), image.size());
+  } catch (ALinkEmu::AVR::FirmwareLoaderException& ex) {
+    EMU_CLIENT_LOG_ERROR("Firmware loading failed: {0}", ex.what());
+  }
 
-  ALinkEmu::AVR::FlashImage image = loader.FromHexFile(hexFileStream);
-
+  avrCore.ExecuteSingleInstruction();
+  avrCore.ExecuteSingleInstruction();
+  avrCore.ExecuteSingleInstruction();
   //  // These variables cast to uint8_t* are the same values
   //  // Since AVR, x86 and any modern CPU are little endian the byte order of multibyte number is reversed
   //  // So then, array {0x01, 0x0c} in memory looks: 0x0c01
@@ -46,11 +52,6 @@ int main(int argc, char* argv[]) {
   //      0x01, 0x0c,  // add r0, r1
   //      0x10, 0x08   // sbc r1, r0
   //  };
-
-  avrCore.LoadFirmware(image.data(), image.size());
-  avrCore.ExecuteSingleInstruction();
-  avrCore.ExecuteSingleInstruction();
-  avrCore.ExecuteSingleInstruction();
 
   return app.exec();
 }
