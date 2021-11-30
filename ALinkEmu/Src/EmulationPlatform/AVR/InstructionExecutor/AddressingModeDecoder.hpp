@@ -9,7 +9,7 @@
 namespace ALinkEmu::AVR {
 
 struct AddressingModeDecoder {
-  static inline uint8_t DecodeRd5(uint32_t opcode) { return (opcode >> 4) & 0xf; }
+  static inline uint8_t DecodeRd5(uint32_t opcode) { return (opcode >> 4) & 0x0F; }
 
   // Standard addressing mode for instructions which performs operations on two registers like ADD or CPC
   static inline std::pair<uint8_t, uint8_t> DecodeRr5Rd5(uint32_t opcode) {
