@@ -6,6 +6,8 @@
 #include <memory>
 #include <vector>
 
+#include "FirmwareLoaderException.hpp"
+
 namespace ALinkEmu::AVR {
 
 using FlashImage = std::vector<uint8_t>;
