@@ -29,10 +29,16 @@ struct AddressingModeDecoder {
    * Register name must be even because after single right bit shift we can store its value on 4 bits
    * (AVR general purpose registers can be stored in 5 bit values (r0 - r31))
    */
-  static inline std::pair<uint8_t, uint8_t> DecodeRr4Rd4(uint32_t opcode) {
+  static inline std::pair<uint8_t, uint8_t> DecodeForMOVW(uint32_t opcode) {
     uint8_t RrAddress4 = (opcode & 0x0F) << 1;
     uint8_t RdAddress4 = ((opcode >> 4) & 0x0F) << 1;
     return {RrAddress4, RdAddress4};
+  }
+
+  static inline std::pair<uint8_t, uint8_t> DecodeForMULS(uint32_t opcode) {
+    uint8_t RrAddress = 16 + (opcode & 0x0F);
+    uint8_t RdAddress = 16 + ((opcode >> 4) & 0x0F);
+    return {RrAddress, RdAddress};
   }
 };
 
