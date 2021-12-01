@@ -59,7 +59,10 @@ void Core::ExecuteSingleInstruction() {
               switch (opcode & 0xFF00) {
                 case 0x0100: {
                   this->instructionExecutor.MOVW(opcode);
-                }
+                } break;
+                case 0x0200: {
+                  this->instructionExecutor.MULS(opcode);
+                } break;
               }
           }
         }

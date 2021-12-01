@@ -25,6 +25,8 @@ class InstructionExecutor {
   void SBC(uint32_t opcode);
   // Copy Register Word
   void MOVW(uint32_t opcode);
+  // Multiply signed
+  void MULS(uint32_t opcode);
 
  private:
   Core* coreRef;

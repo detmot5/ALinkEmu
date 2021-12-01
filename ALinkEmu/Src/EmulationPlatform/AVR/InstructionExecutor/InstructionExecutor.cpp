@@ -90,12 +90,29 @@ void InstructionExecutor::SBC(uint32_t opcode) {
 }
 
 void InstructionExecutor::MOVW(uint32_t opcode) {
-  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr4Rd4(opcode);
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMOVW(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
   uint8_t RrNext = this->coreRef->GetRegisterValue(RrAddress + 1);
 
   this->coreRef->SetRegisterValue(RdAddress, Rr);
   this->coreRef->SetRegisterValue(RdAddress + 1, RrNext);
+}
+
+void InstructionExecutor::MULS(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMULS(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
+
+  uint16_t result = Rr * Rd;
+
+  uint8_t R0Value = result & 0x00FF;
+  uint8_t R1Value = (result >> 8 & 0x00FF);
+
+  this->coreRef->SetRegisterValue(0, R0Value);
+  this->coreRef->SetRegisterValue(1, R1Value);
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
 }  // namespace ALinkEmu::AVR
