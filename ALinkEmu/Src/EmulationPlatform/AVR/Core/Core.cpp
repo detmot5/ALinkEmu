@@ -55,6 +55,9 @@ void Core::ExecuteSingleInstruction() {
             case 0x0800: {
               this->instructionExecutor.SBC(opcode);
             } break;
+            case 0x9c00: {
+              this->instructionExecutor.MUL(opcode);
+            } break;
             default:
               switch (opcode & 0xFF00) {
                 case 0x0100: {
@@ -63,6 +66,22 @@ void Core::ExecuteSingleInstruction() {
                 case 0x0200: {
                   this->instructionExecutor.MULS(opcode);
                 } break;
+                case 0x0300: {
+                   switch (opcode & 0x88) {
+                      case 0x00: {
+                        this->instructionExecutor.MULSU(opcode);
+                      }break;
+                      case 0x08: {
+                        this->instructionExecutor.FMUL(opcode);
+                      }
+                      case 0x80: {
+                       this->instructionExecutor.FMULS(opcode);
+                      }
+                      case 0x88: {
+                       this->instructionExecutor.FMULSU(opcode);
+                      }
+                    }
+                }
               }
           }
         }
