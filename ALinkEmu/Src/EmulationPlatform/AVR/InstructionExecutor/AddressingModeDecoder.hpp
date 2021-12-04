@@ -40,6 +40,12 @@ struct AddressingModeDecoder {
     uint8_t RdAddress = 16 + ((opcode >> 4) & 0x0F);
     return {RrAddress, RdAddress};
   }
+
+  static inline std::pair<uint8_t, uint8_t> DecodeForMUL(uint32_t opcode) {
+    uint8_t RrAddress = 16 + (opcode & 0x7);
+    uint8_t RdAddress = 16 + ((opcode >> 4) & 0x7);
+    return {RrAddress, RdAddress};
+  }
 };
 
 }  // namespace ALinkEmu::AVR
