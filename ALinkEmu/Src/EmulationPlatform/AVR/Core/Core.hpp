@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include "Base/Utils/ArrayBuffer.hpp"
 #include "EmulationPlatform/AVR/InstructionExecutor/InstructionExecutor.hpp"
 #include "EmulationPlatform/AVR/Utils.hpp"
 
@@ -33,6 +34,12 @@ struct PlatformDependentData {
   uint8_t fuse[6];
   uint8_t lockbits;
   uint8_t addressSize;  // 2, or 3 for cores > 128KB in flash
+};
+
+struct IOMemoryAddressListener {
+  RamAddress address;
+  std::function<void()> write;
+  std::function<void()> read;
 };
 
 class Core {
@@ -66,8 +73,8 @@ class Core {
   CoreState state;
   // Program Counter
   FlashAddress PC;
-  std::unique_ptr<uint8_t[]> ram;
-  std::unique_ptr<uint8_t[]> flash;
+  ByteBuffer ram;
+  ByteBuffer flash;
   uint32_t codeEnd;
   uint32_t frequency;
 

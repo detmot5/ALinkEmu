@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "Base/Base.hpp"
+#include "Base/Utils/ArrayBuffer.hpp"
 #include "EmulationPlatform/AVR/InstructionExecutor/InstructionExecutor.hpp"
 
 namespace ALinkEmu::AVR {
@@ -18,11 +19,11 @@ void Core::Init() {
   this->platformDependentData.RAMEND = 2048;
 
   this->state = CoreState::BEFORE_INIT;
-  this->flash = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.FLASHEND + 4]);
-  std::memset(this->flash.get(), 0xFF, this->platformDependentData.FLASHEND + 1);
+  this->flash.Allocate(this->platformDependentData.FLASHEND + 4);
+  this->flash.Memset(0xFF, this->platformDependentData.FLASHEND + 1);
   this->codeEnd = this->platformDependentData.FLASHEND;
-  this->ram = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.RAMEND + 1]);
-  std::memset(this->ram.get(), 0x00, this->platformDependentData.RAMEND);
+  this->ram.Allocate(this->platformDependentData.RAMEND + 1);
+  this->ram.Memset(0x00, this->platformDependentData.RAMEND);
   this->frequency = 10000000;
   this->PC = 0;
 
@@ -81,7 +82,7 @@ uint32_t Core::FetchInstruction(FlashAddress currentPC) {
   return this->flash[currentPC] | (this->flash[currentPC + 1] << 8);
 }
 
-void Core::LoadFirmware(uint8_t* data, size_t size) { std::memcpy(this->flash.get(), data, size); }
+void Core::LoadFirmware(uint8_t* data, size_t size) { this->flash.Memcpy(data, size); }
 
 // Simple way to serialize core registers values (especially SREG) for debugging purposes
 std::string Core::DumpCoreData() {
