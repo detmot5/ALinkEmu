@@ -55,9 +55,6 @@ void Core::ExecuteSingleInstruction() {
             case 0x0800: {
               this->instructionExecutor.SBC(opcode);
             } break;
-            case 0x9c00: {
-              this->instructionExecutor.MUL(opcode);
-            } break;
             default:
               switch (opcode & 0xFF00) {
                 case 0x0100: {
