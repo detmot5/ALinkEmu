@@ -4,6 +4,7 @@
 #pragma once
 
 #include <csignal>
+#include <utility>
 
 #include "Logger.hpp"
 #define EMU_DEBUG_BREAK() raise(SIGABRT)
