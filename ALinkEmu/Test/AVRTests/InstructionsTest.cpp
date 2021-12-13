@@ -55,3 +55,28 @@ TEST(AVRInstructionTest, MULS) {
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::C), (R1result >> 7) & 0x01);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::Z), 0);
 }
+
+TEST(AVRInstructionTest, MUL) {
+  using namespace ALinkEmu::AVR;
+
+  ALinkEmu::AVR::Core avrCore;
+
+  avrCore.Init();
+
+  uint8_t mulOpcode[2] = {
+    0x04, 0x9C
+  };
+
+  avrCore.SetRegisterValue(16, 30);
+  avrCore.SetRegisterValue(20, 30);
+  avrCore.LoadFirmware(mulOpcode, 2);
+  avrCore.ExecuteSingleInstruction();
+
+  uint8_t R0result = avrCore.GetRegisterValue(0);
+  uint8_t R1result = avrCore.GetRegisterValue(1);
+
+  EXPECT_EQ(R0result, 0x84);
+  EXPECT_EQ(R1result, 0x03);
+  EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::C), (R1result >> 7) & 0x01);
+  EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::Z), 0);
+}
