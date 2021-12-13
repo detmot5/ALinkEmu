@@ -70,16 +70,16 @@ void Core::ExecuteSingleInstruction() {
                    switch (opcode & 0x88) {
                       case 0x00: {
                         this->instructionExecutor.MULSU(opcode);
-                      }break;
+                      } break;
                       case 0x08: {
                         this->instructionExecutor.FMUL(opcode);
-                      }
+                      } break;
                       case 0x80: {
                        this->instructionExecutor.FMULS(opcode);
-                      }
+                      } break;
                       case 0x88: {
                        this->instructionExecutor.FMULSU(opcode);
-                      }
+                      } break;
                     }
                 }
               }
