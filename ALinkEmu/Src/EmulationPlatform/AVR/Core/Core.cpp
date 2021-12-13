@@ -84,8 +84,26 @@ uint32_t Core::FetchInstruction(FlashAddress currentPC) {
 
 void Core::LoadFirmware(uint8_t* data, size_t size) { this->flash.Memcpy(data, size); }
 
-// Simple way to serialize core registers values (especially SREG) for debugging purposes
+void Core::SetRegisterValue(RamAddress address, uint8_t value) {
+  this->ram[address] = value;
+  // If writing to IO space - TODO: remove magic number
+  if (address > 31) {
+    // notify IO module about writing to its memory
+    this->ioController.CallIoWriteHook(address);
+  }
+}
+
+uint8_t Core::GetRegisterValue(RamAddress address) {
+  // If reading from IO Space
+  if (address > 31) {
+    // notify IO module about access to its memory
+    this->ioController.CallIoReadHook(address);
+  }
+  return this->ram[address];
+}
+
 std::string Core::DumpCoreData() {
+  // Simple way to serialize core registers values (especially SREG) for debugging purposes
   std::string sreg = fmt::format("SREG: I = {0} T = {1}  H = {2} S = {3} V = {4} N = {5} Z = {6} C = {7}\n",
                                  this->GetSregFlagValue(SregFlag::I), this->GetSregFlagValue(SregFlag::T),
                                  this->GetSregFlagValue(SregFlag::H), this->GetSregFlagValue(SregFlag::S),
