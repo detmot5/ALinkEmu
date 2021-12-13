@@ -27,8 +27,6 @@ class InstructionExecutor {
   void MOVW(uint32_t opcode);
   // Multiply signed
   void MULS(uint32_t opcode);
-  // Multiply Unsigned
-  void MUL(uint32_t opcode);
   //
   void MULSU(uint32_t opcode);
   //
