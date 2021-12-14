@@ -135,12 +135,12 @@ void InstructionExecutor::MULSU(uint32_t opcode) {
 void InstructionExecutor::FMUL(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress); 
 
-  uint16_t result = Rr * Rd;
+  uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
-  uint8_t R1Value = (result >> 8 & 0x00FF) << 1;
+  uint8_t R1Value = result >> 8 & 0x00FF;
 
   this->coreRef->SetRegisterValue(0, R0Value);
   this->coreRef->SetRegisterValue(1, R1Value);
@@ -154,10 +154,10 @@ void InstructionExecutor::FMULS(uint32_t opcode) {
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
   uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
 
-  uint16_t result = Rr * Rd;
+  uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
-  uint8_t R1Value = (result >> 8 & 0x00FF) << 1;
+  uint8_t R1Value = result >> 8 & 0x00FF;
 
   this->coreRef->SetRegisterValue(0, R0Value);
   this->coreRef->SetRegisterValue(1, R1Value);
@@ -171,10 +171,10 @@ void InstructionExecutor::FMULSU(uint32_t opcode) {
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
   uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
 
-  uint16_t result = Rr * Rd;
+  uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
-  uint8_t R1Value = (result >> 8 & 0x00FF) << 1;
+  uint8_t R1Value = result >> 8 & 0x00FF;
 
   this->coreRef->SetRegisterValue(0, R0Value);
   this->coreRef->SetRegisterValue(1, R1Value);
