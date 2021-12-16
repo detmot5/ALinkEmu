@@ -96,8 +96,8 @@ TEST(AVRInstructionTest, FMUL) {
   uint8_t R0result = avrCore.GetRegisterValue(0);
   uint8_t R1result = avrCore.GetRegisterValue(1);
 
-  EXPECT_EQ(R0result, 0x8);
-  EXPECT_EQ(R1result, 0x7);
+  EXPECT_EQ(R0result, 0x08);
+  EXPECT_EQ(R1result, 0x07);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::C), (R1result >> 7) & 0x01);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::Z), 0);
 }
@@ -119,8 +119,8 @@ TEST(AVRInstructionTest, FMULS) {
   uint8_t R0result = avrCore.GetRegisterValue(0);
   uint8_t R1result = avrCore.GetRegisterValue(1);
 
-  EXPECT_EQ(R0result, 0x8);
-  EXPECT_EQ(R1result, 0x7);
+  EXPECT_EQ(R0result, 0x08);
+  EXPECT_EQ(R1result, 0x07);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::C), (R1result >> 7) & 0x01);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::Z), 0);
 }
@@ -142,8 +142,8 @@ TEST(AVRInstructionTest, FMULSU) {
   uint8_t R0result = avrCore.GetRegisterValue(0);
   uint8_t R1result = avrCore.GetRegisterValue(1);
 
-  EXPECT_EQ(R0result, 0x8);
-  EXPECT_EQ(R1result, 0x7);
+  EXPECT_EQ(R0result, 0x08);
+  EXPECT_EQ(R1result, 0x07);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::C), (R1result >> 7) & 0x01);
   EXPECT_EQ(avrCore.GetSregFlagValue(SregFlag::Z), 0);
 }
