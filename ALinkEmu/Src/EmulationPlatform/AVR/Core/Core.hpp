@@ -58,8 +58,8 @@ class Core {
 
   // Used only for GP and IO registers - invokes proper events when
   // written or accessed particular register
-  void SetRegisterValue(RamAddress address, uint8_t value) { this->ram[address] = value; }
-  uint8_t GetRegisterValue(RamAddress address) { return this->ram[address]; }
+  void SetRegisterValue(RamAddress address, uint8_t value);
+  uint8_t GetRegisterValue(RamAddress address);
 
   // Write to ram directly without any checks - when IO module writes to memory doesn't need to notify itself
   // about that ;)
