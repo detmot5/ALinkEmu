@@ -130,13 +130,13 @@ TEST(AVRInstructionTest, FMULSU) {
 
   ALinkEmu::AVR::Core avrCore;
   avrCore.Init();
-  uint8_t mulsOpcode[2] = {
+  uint8_t fmulsuOpcode[2] = {
       0xCD, 0x03  // fmulsu r20, r21
   };
 
   avrCore.SetRegisterValue(20, 30);
   avrCore.SetRegisterValue(21, 30);
-  avrCore.LoadFirmware(mulsOpcode, 2);
+  avrCore.LoadFirmware(fmulsuOpcode, 2);
   avrCore.ExecuteSingleInstruction();
 
   uint8_t R0result = avrCore.GetRegisterValue(0);
