@@ -132,6 +132,7 @@ void InstructionExecutor::MULSU(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+// performs multiplication and shift one bit to the left
 void InstructionExecutor::FMUL(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
@@ -149,6 +150,7 @@ void InstructionExecutor::FMUL(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+// performs multiplication and shift one bit to the left
 void InstructionExecutor::FMULS(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
@@ -166,6 +168,7 @@ void InstructionExecutor::FMULS(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+// performs multiplication and shift one bit to the left
 void InstructionExecutor::FMULSU(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
