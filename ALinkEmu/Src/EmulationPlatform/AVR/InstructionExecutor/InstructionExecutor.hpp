@@ -25,15 +25,15 @@ class InstructionExecutor {
   void SBC(uint32_t opcode);
   // Copy Register Word
   void MOVW(uint32_t opcode);
-  // Multiply signed
+  // Multiply Signed
   void MULS(uint32_t opcode);
-  //
+  // Multiply Signed With Unsigned
   void MULSU(uint32_t opcode);
-  //
+  // Fractional Multiply Unsigned
   void FMUL(uint32_t opcode); 
-  //
+  // Fractional Multiply Signed
   void FMULS(uint32_t opcode);
-  //
+  // Fractional Multiply Signed With Unsigned
   void FMULSU(uint32_t opcode);
 
  private:
