@@ -16,7 +16,7 @@ void IOController::DetachIoReadHook(RamAddress address) { this->ioReadHooksTable
 
 void IOController::CallIoWriteHook(RamAddress address) {
   if (this->ioWriteHooksTable.find(address) != this->ioWriteHooksTable.end()) {
-    auto hook = this->ioReadHooksTable[address];
+    auto hook = this->ioWriteHooksTable[address];
     if (hook) {
       hook(address);
     }
