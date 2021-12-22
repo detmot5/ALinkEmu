@@ -14,8 +14,8 @@ namespace ALinkEmu::AVR {
 class Core;
 
 class InstructionExecutor {
- public:
-  explicit InstructionExecutor(Core* coreRef) : coreRef(coreRef) {}
+public:
+  explicit InstructionExecutor(Core *coreRef) : coreRef(coreRef) {}
 
   // Compare With Carry
   void CPC(uint32_t opcode);
@@ -28,8 +28,13 @@ class InstructionExecutor {
   // Multiply signed
   void MULS(uint32_t opcode);
 
- private:
-  Core* coreRef;
+  // OUT - Write to IO space
+  void OUT(uint32_t opcode);
+  // IN - Read from IO space
+  void IN(uint32_t opcode);
+
+private:
+  Core *coreRef;
 };
 
-}  // namespace ALinkEmu::AVR
+} // namespace ALinkEmu::AVR

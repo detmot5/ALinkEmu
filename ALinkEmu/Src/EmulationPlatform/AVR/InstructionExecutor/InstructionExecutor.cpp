@@ -115,4 +115,16 @@ void InstructionExecutor::MULS(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+void InstructionExecutor::OUT(uint32_t opcode) {
+  auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  this->coreRef->SetRegisterValue(ioAddress, Rr);
+}
+
+void InstructionExecutor::IN(uint32_t opcode) {
+  auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
+  uint8_t ioValue = this->coreRef->GetRegisterValue(ioAddress);
+  this->coreRef->SetRegisterValue(RrAddress, ioValue);
+}
+
 }  // namespace ALinkEmu::AVR

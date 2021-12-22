@@ -18,6 +18,16 @@ struct AddressingModeDecoder {
     return {RrAddress5, RdAddress5};
   }
 
+  // Standard direct IO addressing mode
+  // xxxx xAAr rrrr AAAA
+  // where "r" stands for register which is used to perform operation
+  // and "A" means address of IO register assigned to particular IO device
+  static inline std::pair<uint8_t, uint8_t> DecodeR5A6(uint32_t opcode) {
+    uint8_t registerAddress = (opcode >> 4) & 0x1F;
+    uint8_t ioAddress = ((((opcode >> 9) & 3) << 4) | (opcode & 0x0F)) + 32;
+    return {registerAddress, ioAddress};
+  }
+
   /*
    * Special addressing mode where only even register addresses are used
    * That's because usually this addressing mode is used in instructions which

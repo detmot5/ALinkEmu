@@ -69,6 +69,18 @@ void Core::ExecuteSingleInstruction() {
         }
       }
     } break;
+    case 0x9000: {
+      case 0xB000: {
+        switch (opcode & 0xF800) {
+          case 0xB800: {
+            this->instructionExecutor.OUT(opcode);
+          } break;
+          case 0xB000: {
+            this->instructionExecutor.IN(opcode);
+          } break;
+        }
+      } break;
+    } break;
     default:
       EMU_LOG_WARN("Invalid opcode: {0:x}", opcode);
   }
