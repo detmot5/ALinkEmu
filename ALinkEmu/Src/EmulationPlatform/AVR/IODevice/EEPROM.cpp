@@ -22,23 +22,23 @@ void EEPROM::OnEECRWrite(uint8_t newEECRvalue) {
   bool EEMPEValue = this->coreRef->GetRegisterBit(this->EEMPEBit);
   bool EEREValue = this->coreRef->GetRegisterBit(this->EEREBit);
 
-  // EEMPE should be cleared after 4 cycles but we don't have ability to check it yet
 
+  // EEMPE should be cleared after 4 cycles but we don't have ability to check it yet
   // we need something like this
   //  auto clearEEMPE = [&]() { this->coreRef->SetRegisterBit(this->EEMPEBit, false); };
-  //  this->coreRef.GetSystemClock().attachEventOnCycleCountElapse(4, clearEEMPE);
+  //  this->coreRef.GetSystemClock().AttachEventOnCycleCountElapse(4, clearEEMPE);
 
   if (EEPEValue == true && EEMPEValue == true) {
     this->memory[eepromAddress] = this->coreRef->GetRamValue(this->EEDR);
-    this->coreRef->SetRegisterBit(this->EEMPEBit, false);
+    this->coreRef->ClearRegisterBit(this->EEMPEBit);
   }
 
   if (EEREValue == true) {
     this->coreRef->SetRamValue(this->EEDR, this->memory[eepromAddress]);
   }
 
-  this->coreRef->SetRegisterBit(this->EEPEBit, false);
-  this->coreRef->SetRegisterBit(this->EEREBit, false);
+  this->coreRef->ClearRegisterBit(this->EEPEBit);
+  this->coreRef->ClearRegisterBit(this->EEREBit);
 }
 
 }  // namespace ALinkEmu::AVR

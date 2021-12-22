@@ -63,20 +63,20 @@ class Core {
 
   // Write to ram directly without any checks - when IO module writes to memory doesn't need to notify itself
   // about that ;)
-  void SetRamValue(RamAddress address, uint8_t value);
-  uint8_t GetRamValue(RamAddress address);
+  void SetRamValue(RamAddress address, uint8_t value) { this->ram[address] = value; };
+  uint8_t GetRamValue(RamAddress address) { return this->ram[address]; }
 
   inline bool GetSregFlagValue(SregFlag flag) { return this->sregMirror[static_cast<size_t>(flag)]; }
   inline void SetSregFlagValue(SregFlag flag, bool value) {
     this->sregMirror[static_cast<size_t>(flag)] = value;
   }
 
-  inline void SetRegisterBit(RegisterBitLocation registerBit, bool value) {
-    if (value == true) {
-      this->ram[registerBit.address] |= (1 << registerBit.offset);
-    } else {
-      this->ram[registerBit.address] &= ~(1 << registerBit.offset);
-    }
+  inline void SetRegisterBit(RegisterBitLocation registerBit) {
+    this->ram[registerBit.address] |= (1 << registerBit.offset);
+  }
+
+  inline void ClearRegisterBit(RegisterBitLocation registerBit) {
+    this->ram[registerBit.address] &= ~(1 << registerBit.offset);
   }
 
   inline bool GetRegisterBit(RegisterBitLocation registerBit) {
