@@ -115,4 +115,76 @@ void InstructionExecutor::MULS(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+void InstructionExecutor::MULSU(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+
+  uint16_t result = Rr * Rd;
+
+  uint8_t R0Value = result & 0x00FF;
+  uint8_t R1Value = (result >> 8 & 0x00FF);
+
+  this->coreRef->SetRegisterValue(0, R0Value);
+  this->coreRef->SetRegisterValue(1, R1Value);
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
+}
+
+// performs multiplication and shift one bit to the left
+void InstructionExecutor::FMUL(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress); 
+
+  uint16_t result = (Rr * Rd) << 1;
+
+  uint8_t R0Value = result & 0x00FF;
+  uint8_t R1Value = result >> 8 & 0x00FF;
+
+  this->coreRef->SetRegisterValue(0, R0Value);
+  this->coreRef->SetRegisterValue(1, R1Value);
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
+}
+
+// performs multiplication and shift one bit to the left
+void InstructionExecutor::FMULS(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+
+  uint16_t result = (Rr * Rd) << 1;
+
+  uint8_t R0Value = result & 0x00FF;
+  uint8_t R1Value = result >> 8 & 0x00FF;
+
+  this->coreRef->SetRegisterValue(0, R0Value);
+  this->coreRef->SetRegisterValue(1, R1Value);
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
+}
+
+// performs multiplication and shift one bit to the left
+void InstructionExecutor::FMULSU(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+
+  uint16_t result = (Rr * Rd) << 1;
+
+  uint8_t R0Value = result & 0x00FF;
+  uint8_t R1Value = result >> 8 & 0x00FF;
+
+  this->coreRef->SetRegisterValue(0, R0Value);
+  this->coreRef->SetRegisterValue(1, R1Value);
+
+  this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
+}
+
+
 }  // namespace ALinkEmu::AVR
