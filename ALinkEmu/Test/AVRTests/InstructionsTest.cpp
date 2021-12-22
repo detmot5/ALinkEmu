@@ -7,7 +7,7 @@
 
 #include "../../ALinkEmu.hpp"
 
-TEST(AVRTest, AddFunctionWithOverflowSregTests) {
+TEST(AVRInstructionTest, AddFunctionWithOverflowSregTests) {
   using namespace ALinkEmu::AVR;
   ALinkEmu::AVR::Core avrCore;
   Logger::Init();

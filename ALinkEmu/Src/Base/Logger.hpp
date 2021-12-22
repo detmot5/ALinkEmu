@@ -1,12 +1,10 @@
 //
 // Created by Norbert Bielak on 17.11.2021.
 //
-
-#pragma  once
+#pragma once
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
-
 
 class Logger {
  public:
@@ -19,10 +17,12 @@ class Logger {
   }
 
   static inline std::shared_ptr<spdlog::logger>& GetEmuLogger() {
+    if (!emuLogger) Init();
     return emuLogger;
   }
 
   static inline std::shared_ptr<spdlog::logger>& GetClientLogger() {
+    if (!clientLogger) Init();
     return clientLogger;
   }
 
@@ -31,20 +31,35 @@ class Logger {
   static inline std::shared_ptr<spdlog::logger> clientLogger;
 };
 
-
+#if EMU_DEBUG
 // Core log macros
-#define EMU_LOG_TRACE(...)    Logger::GetEmuLogger()->trace(__VA_ARGS__)
-#define EMU_LOG_INFO(...)     Logger::GetEmuLogger()->info(__VA_ARGS__)
-#define EMU_LOG_WARN(...)     Logger::GetEmuLogger()->warn(__VA_ARGS__)
-#define EMU_LOG_ERROR(...)    Logger::GetEmuLogger()->error(__VA_ARGS__)
+#define EMU_LOG_TRACE(...) Logger::GetEmuLogger()->trace(__VA_ARGS__)
+#define EMU_LOG_INFO(...) Logger::GetEmuLogger()->info(__VA_ARGS__)
+#define EMU_LOG_WARN(...) Logger::GetEmuLogger()->warn(__VA_ARGS__)
+#define EMU_LOG_ERROR(...) Logger::GetEmuLogger()->error(__VA_ARGS__)
 #define EMU_LOG_CRITICAL(...) Logger::GetEmuLogger()->critical(__VA_ARGS__)
 
 // Client log macros
-#define EMU_CLIENT_LOG_TRACE(...)           Logger::GetClientLogger()->trace(__VA_ARGS__)
-#define EMU_CLIENT_LOG_INFO(...)            Logger::GetClientLogger()->info(__VA_ARGS__)
-#define EMU_CLIENT_LOG_WARN(...)            Logger::GetClientLogger()->warn(__VA_ARGS__)
-#define EMU_CLIENT_LOG_ERROR(...)           Logger::GetClientLogger()->error(__VA_ARGS__)
-#define EMU_CLIENT_LOG_CRITICAL(...)        Logger::GetClientLogger()->critical(__VA_ARGS__)
+#define EMU_CLIENT_LOG_TRACE(...) Logger::GetClientLogger()->trace(__VA_ARGS__)
+#define EMU_CLIENT_LOG_INFO(...) Logger::GetClientLogger()->info(__VA_ARGS__)
+#define EMU_CLIENT_LOG_WARN(...) Logger::GetClientLogger()->warn(__VA_ARGS__)
+#define EMU_CLIENT_LOG_ERROR(...) Logger::GetClientLogger()->error(__VA_ARGS__)
+#define EMU_CLIENT_LOG_CRITICAL(...) Logger::GetClientLogger()->critical(__VA_ARGS__)
 
+#else
 
+// Core log macros
+#define EMU_LOG_TRACE(...)
+#define EMU_LOG_INFO(...)
+#define EMU_LOG_WARN(...)
+#define EMU_LOG_ERROR(...)
+#define EMU_LOG_CRITICAL(...)
 
+// Client log macros
+#define EMU_CLIENT_LOG_TRACE(...)
+#define EMU_CLIENT_LOG_INFO(...)
+#define EMU_CLIENT_LOG_WARN(...)
+#define EMU_CLIENT_LOG_ERROR(...)
+#define EMU_CLIENT_LOG_CRITICAL(...)
+
+#endif

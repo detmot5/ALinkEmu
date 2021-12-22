@@ -115,6 +115,8 @@ void InstructionExecutor::MULS(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+
+
 void InstructionExecutor::MULSU(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
   uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
@@ -185,6 +187,18 @@ void InstructionExecutor::FMULSU(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
+  
+  
+void InstructionExecutor::OUT(uint32_t opcode) {
+  auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
+  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
+  this->coreRef->SetRegisterValue(ioAddress, Rr);
+}
 
+void InstructionExecutor::IN(uint32_t opcode) {
+  auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
+  uint8_t ioValue = this->coreRef->GetRegisterValue(ioAddress);
+  this->coreRef->SetRegisterValue(RrAddress, ioValue);
+}
 
 }  // namespace ALinkEmu::AVR

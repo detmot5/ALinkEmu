@@ -8,6 +8,7 @@
 #include <sstream>
 
 #include "Base/Base.hpp"
+#include "Base/Utils/ArrayBuffer.hpp"
 #include "EmulationPlatform/AVR/InstructionExecutor/InstructionExecutor.hpp"
 
 namespace ALinkEmu::AVR {
@@ -18,11 +19,11 @@ void Core::Init() {
   this->platformDependentData.RAMEND = 2048;
 
   this->state = CoreState::BEFORE_INIT;
-  this->flash = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.FLASHEND + 4]);
-  std::memset(this->flash.get(), 0xFF, this->platformDependentData.FLASHEND + 1);
+  this->flash.Allocate(this->platformDependentData.FLASHEND + 4);
+  this->flash.Memset(0xFF, this->platformDependentData.FLASHEND + 1);
   this->codeEnd = this->platformDependentData.FLASHEND;
-  this->ram = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.RAMEND + 1]);
-  std::memset(this->ram.get(), 0x00, this->platformDependentData.RAMEND);
+  this->ram.Allocate(this->platformDependentData.RAMEND + 1);
+  this->ram.Memset(0x00, this->platformDependentData.RAMEND);
   this->frequency = 10000000;
   this->PC = 0;
 
@@ -84,6 +85,18 @@ void Core::ExecuteSingleInstruction() {
         }
       }
     } break;
+    case 0x9000: {
+      case 0xB000: {
+        switch (opcode & 0xF800) {
+          case 0xB800: {
+            this->instructionExecutor.OUT(opcode);
+          } break;
+          case 0xB000: {
+            this->instructionExecutor.IN(opcode);
+          } break;
+        }
+      } break;
+    } break;
     default:
       EMU_LOG_WARN("Invalid opcode: {0:x}", opcode);
   }
@@ -97,10 +110,28 @@ uint32_t Core::FetchInstruction(FlashAddress currentPC) {
   return this->flash[currentPC] | (this->flash[currentPC + 1] << 8);
 }
 
-void Core::LoadFirmware(uint8_t* data, size_t size) { std::memcpy(this->flash.get(), data, size); }
+void Core::LoadFirmware(uint8_t* data, size_t size) { this->flash.Memcpy(data, size); }
 
-// Simple way to serialize core registers values (especially SREG) for debugging purposes
+void Core::SetRegisterValue(RamAddress address, uint8_t value) {
+  this->ram[address] = value;
+  // If writing to IO space - TODO: remove magic number
+  if (address > 31) {
+    // notify IO module about writing to its memory
+    this->ioController.CallIoWriteHook(address);
+  }
+}
+
+uint8_t Core::GetRegisterValue(RamAddress address) {
+  // If reading from IO Space
+  if (address > 31) {
+    // notify IO module about access to its memory
+    this->ioController.CallIoReadHook(address);
+  }
+  return this->ram[address];
+}
+
 std::string Core::DumpCoreData() {
+  // Simple way to serialize core registers values (especially SREG) for debugging purposes
   std::string sreg = fmt::format("SREG: I = {0} T = {1}  H = {2} S = {3} V = {4} N = {5} Z = {6} C = {7}\n",
                                  this->GetSregFlagValue(SregFlag::I), this->GetSregFlagValue(SregFlag::T),
                                  this->GetSregFlagValue(SregFlag::H), this->GetSregFlagValue(SregFlag::S),
