@@ -16,7 +16,7 @@ using IOHook = std::function<void(uint8_t)>;
 
 class IOController {
  public:
-  IOController(Core* coreRef) : coreRef(coreRef) {}
+  explicit IOController(Core* coreRef) : coreRef(coreRef) {}
 
   void AttachIoWriteHook(RamAddress address, IOHook ioHook);
   void AttachIoReadHook(RamAddress address, IOHook ioHook);
@@ -29,11 +29,11 @@ class IOController {
 
  private:
   Core* coreRef;
-  // Using hash tables instead of normaln arrays and trying to map ram addresses to it's indexesfor better
-  // readability. This should not have any significant performace overhead since key is uint16_t and there
+  // Using hash tables instead of normal arrays and trying to map ram addresses to it's indexes for better
+  // readability. This should not have any significant performance overhead since key is uint16_t and there
   // should not be any the same hashes -> so it should act as normal array
-  std::unordered_map<RamAddress, std::function<void(uint8_t)>> ioWriteHooksTable;
-  std::unordered_map<RamAddress, std::function<void(uint8_t)>> ioReadHooksTable;
+  std::unordered_map<RamAddress, IOHook> ioWriteHooksTable;
+  std::unordered_map<RamAddress, IOHook> ioReadHooksTable;
 };
 
 }  // namespace ALinkEmu::AVR
