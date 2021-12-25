@@ -4,14 +4,16 @@
 
 #include "InstructionExecutor.hpp"
 
+#include "EmulationPlatform/AVR/Chip/AvrChip.hpp"
 #include "EmulationPlatform/AVR/Core/Core.hpp"
 
 namespace ALinkEmu::AVR {
 
 void InstructionExecutor::CPC(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint8_t carryFlag = this->coreRef->GetSregFlagValue(SregFlag::C);
 
@@ -39,10 +41,12 @@ void InstructionExecutor::CPC(uint32_t opcode) {
 
 void InstructionExecutor::ADD(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
   uint8_t result = Rr + Rd;
-  this->coreRef->SetRegisterValue(RdAddress, result);
+
+  memory.SetRegisterValue(RdAddress, result);
 
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
   this->coreRef->SetSregFlagValue(SregFlag::N, (result >> 7) & 0x01);
@@ -63,11 +67,13 @@ void InstructionExecutor::ADD(uint32_t opcode) {
 
 void InstructionExecutor::SBC(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
   uint8_t carryFlag = this->coreRef->GetSregFlagValue(SregFlag::C);
   uint8_t result = Rd - Rr - carryFlag;
-  this->coreRef->SetRegisterValue(RdAddress, result);
+  memory.SetRegisterValue(RdAddress, result);
 
   uint8_t carryFlagsCondition = (~Rd & Rr) | (Rr & result) | (result & ~Rd);
   uint8_t carry = (carryFlagsCondition >> 7) & 0x01;
@@ -91,44 +97,45 @@ void InstructionExecutor::SBC(uint32_t opcode) {
 
 void InstructionExecutor::MOVW(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMOVW(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t RrNext = this->coreRef->GetRegisterValue(RrAddress + 1);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t RrNext = memory.GetRegisterValue(RrAddress + 1);
 
-  this->coreRef->SetRegisterValue(RdAddress, Rr);
-  this->coreRef->SetRegisterValue(RdAddress + 1, RrNext);
+  memory.SetRegisterValue(RdAddress, Rr);
+  memory.SetRegisterValue(RdAddress + 1, RrNext);
 }
 
 void InstructionExecutor::MULS(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMULS(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint16_t result = Rr * Rd;
 
   uint8_t R0Value = result & 0x00FF;
   uint8_t R1Value = (result >> 8 & 0x00FF);
 
-  this->coreRef->SetRegisterValue(0, R0Value);
-  this->coreRef->SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(0, R0Value);
+  memory.SetRegisterValue(1, R1Value);
 
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
-
-
 void InstructionExecutor::MULSU(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint16_t result = Rr * Rd;
 
   uint8_t R0Value = result & 0x00FF;
   uint8_t R1Value = (result >> 8 & 0x00FF);
 
-  this->coreRef->SetRegisterValue(0, R0Value);
-  this->coreRef->SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(0, R0Value);
+  memory.SetRegisterValue(1, R1Value);
 
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
@@ -137,16 +144,17 @@ void InstructionExecutor::MULSU(uint32_t opcode) {
 // performs multiplication and shift one bit to the left
 void InstructionExecutor::FMUL(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress); 
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
   uint8_t R1Value = result >> 8 & 0x00FF;
 
-  this->coreRef->SetRegisterValue(0, R0Value);
-  this->coreRef->SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(0, R0Value);
+  memory.SetRegisterValue(1, R1Value);
 
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
@@ -155,16 +163,17 @@ void InstructionExecutor::FMUL(uint32_t opcode) {
 // performs multiplication and shift one bit to the left
 void InstructionExecutor::FMULS(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
   uint8_t R1Value = result >> 8 & 0x00FF;
 
-  this->coreRef->SetRegisterValue(0, R0Value);
-  this->coreRef->SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(0, R0Value);
 
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
@@ -173,32 +182,34 @@ void InstructionExecutor::FMULS(uint32_t opcode) {
 // performs multiplication and shift one bit to the left
 void InstructionExecutor::FMULSU(uint32_t opcode) {
   auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeForMUL(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  uint8_t Rd = this->coreRef->GetRegisterValue(RdAddress);  
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
 
   uint16_t result = (Rr * Rd) << 1;
 
   uint8_t R0Value = result & 0x00FF;
   uint8_t R1Value = result >> 8 & 0x00FF;
 
-  this->coreRef->SetRegisterValue(0, R0Value);
-  this->coreRef->SetRegisterValue(1, R1Value);
+  memory.SetRegisterValue(0, R0Value);
+  memory.SetRegisterValue(1, R1Value);
 
   this->coreRef->SetSregFlagValue(SregFlag::C, (result >> 15 & 0x01));
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
-  
-  
+
 void InstructionExecutor::OUT(uint32_t opcode) {
   auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
-  uint8_t Rr = this->coreRef->GetRegisterValue(RrAddress);
-  this->coreRef->SetRegisterValue(ioAddress, Rr);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  memory.SetRegisterValue(ioAddress, Rr);
 }
 
 void InstructionExecutor::IN(uint32_t opcode) {
   auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
-  uint8_t ioValue = this->coreRef->GetRegisterValue(ioAddress);
-  this->coreRef->SetRegisterValue(RrAddress, ioValue);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t ioValue = memory.GetRegisterValue(ioAddress);
+  memory.SetRegisterValue(RrAddress, ioValue);
 }
 
 }  // namespace ALinkEmu::AVR

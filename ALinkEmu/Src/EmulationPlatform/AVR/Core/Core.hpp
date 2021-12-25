@@ -19,101 +19,49 @@ enum class CoreState {
   CRASHED,
 };
 
-struct PlatformDependentData {
-  // Last address of IO Section
-  uint16_t IOEND;
-  // Last address of RAM
-  uint16_t RAMEND;
-  // Last address of Flash memory
-  uint32_t FLASHEND;
-  // Last Address of EEPROM memory
-  uint32_t E2END;
-  uint16_t RAMPZ;  // optional, only for ELPM/SPM on >64Kb cores
-  uint16_t EIND;   // optional, only for EIJMP/RECALL on >64Kb cores
-  uint8_t vectorSize;
-  uint8_t signature[3];
-  uint8_t fuse[6];
-  uint8_t lockbits;
-  uint8_t addressSize;  // 2, or 3 for cores > 128KB in flash
-};
-
-struct IOMemoryAddressListener {
-  RamAddress address;
-  std::function<void()> write;
-  std::function<void()> read;
-};
+struct AvrChip;
 
 class Core {
   friend class InstructionExecutor;
 
  public:
-  Core() : instructionExecutor(this), ioController(this) {}
+  explicit Core(AvrChip& relatedChip) : instructionExecutor(this), relatedChip(relatedChip) {}
 
   void Init();
-  void Reset();
+  void Restart();
   void Shutdown();
   void ExecuteSingleInstruction();
-  uint32_t FetchInstruction(FlashAddress currentPC);
-  void LoadFirmware(uint8_t* data, size_t size);
 
-  // Used only for GP and IO registers - invokes proper events when
-  // written or accessed particular register
-  void SetRegisterValue(RamAddress address, uint8_t value);
-  uint8_t GetRegisterValue(RamAddress address);
-
-  // Write to ram directly without any checks - when IO module writes to memory doesn't need to notify itself
-  // about that ;)
-  void SetRamValue(RamAddress address, uint8_t value) { this->ram[address] = value; };
-  uint8_t GetRamValue(RamAddress address) { return this->ram[address]; }
 
   inline bool GetSregFlagValue(SregFlag flag) { return this->sregMirror[static_cast<size_t>(flag)]; }
   inline void SetSregFlagValue(SregFlag flag, bool value) {
     this->sregMirror[static_cast<size_t>(flag)] = value;
   }
 
-  inline void SetRegisterBit(RegisterBitLocation registerBit) {
-    this->ram[registerBit.address] |= (1 << registerBit.offset);
-  }
-
-  inline void ClearRegisterBit(RegisterBitLocation registerBit) {
-    this->ram[registerBit.address] &= ~(1 << registerBit.offset);
-  }
-
-  inline bool GetRegisterBit(RegisterBitLocation registerBit) {
-    return this->ram[registerBit.address] & (1 << registerBit.offset);
-  }
-
   inline CoreState GetCoreState() { return this->state; }
-
-  IOController& GetIoController() { return this->ioController; }
-  const PlatformDependentData& GetPlatformDependentData() { return this->platformDependentData; }
 
   std::string DumpCoreData();
 
  private:
   InstructionExecutor instructionExecutor;
-  IOController ioController;
 
  private:
+  AvrChip& relatedChip;
   std::string name;
   CoreState state;
-  // Program Counter
-  FlashAddress PC;
-  ByteBuffer ram;
-  ByteBuffer flash;
+  FlashAddress PC; // Program Counter
   uint32_t codeEnd;
   uint32_t frequency;
 
-  PlatformDependentData platformDependentData;
 
   struct MicrocontrollerStatusRegister {
-    // Power On Reset Flag
+    // Power On Restart Flag
     RegisterBitLocation PORF;
-    // External Reset Flag
+    // External Restart Flag
     RegisterBitLocation EXTRF;
-    // Brown Out Reset Flag
+    // Brown Out Restart Flag
     RegisterBitLocation BORF;
-    // Watchdog System Reset Flag
+    // Watchdog System Restart Flag
     RegisterBitLocation WDRF;
   } MCUSR{};
 

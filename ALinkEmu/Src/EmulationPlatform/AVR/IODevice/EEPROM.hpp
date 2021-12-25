@@ -6,15 +6,15 @@
 #include "Base/Base.hpp"
 #include "Base/Utils/ArrayBuffer.hpp"
 #include "EmulationPlatform/AVR/Utils.hpp"
-#include "IODeviceBase.hpp"
+#include "IODevice.hpp"
 
 namespace ALinkEmu::AVR {
 
-class EEPROM : public IODeviceBase {
+class EEPROM : public IODevice {
  public:
-  explicit EEPROM(Core* core) : IODeviceBase(core) {}
-  void OnAttach() override;
-  void OnDetach() override;
+  explicit EEPROM(AvrChip& relatedChip) : IODevice(relatedChip) {}
+  void OnInit() override;
+  void OnShutdown() override;
 
  private:
   void OnEECRWrite(uint8_t newEECRvalue);
