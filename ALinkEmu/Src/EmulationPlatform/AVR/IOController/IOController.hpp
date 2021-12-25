@@ -10,14 +10,11 @@
 
 namespace ALinkEmu::AVR {
 
-class Core;
 
 using IOHook = std::function<void(uint8_t)>;
 
 class IOController {
  public:
-  explicit IOController(Core* coreRef) : coreRef(coreRef) {}
-
   void AttachIoWriteHook(RamAddress address, IOHook ioHook);
   void AttachIoReadHook(RamAddress address, IOHook ioHook);
 
@@ -27,8 +24,9 @@ class IOController {
   void CallIoWriteHook(RamAddress address);
   void CallIoReadHook(RamAddress address);
 
+  void DetachAllHooks();
+
  private:
-  Core* coreRef;
   // Using hash tables instead of normal arrays and trying to map ram addresses to it's indexes for better
   // readability. This should not have any significant performance overhead since key is uint16_t and there
   // should not be any the same hashes -> so it should act as normal array

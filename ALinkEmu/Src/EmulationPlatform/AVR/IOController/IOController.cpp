@@ -1,13 +1,15 @@
 #include "IOController.hpp"
 
+#include <utility>
+
 namespace ALinkEmu::AVR {
 
 void IOController::AttachIoWriteHook(RamAddress address, IOHook ioHook) {
-  this->ioWriteHooksTable[address] = ioHook;
+  this->ioWriteHooksTable[address] = std::move(ioHook);
 }
 
 void IOController::AttachIoReadHook(RamAddress address, IOHook ioHook) {
-  this->ioReadHooksTable[address] = ioHook;
+  this->ioReadHooksTable[address] = std::move(ioHook);
 }
 
 void IOController::DetachIoWriteHook(RamAddress address) { this->ioWriteHooksTable.erase(address); }
@@ -30,6 +32,11 @@ void IOController::CallIoReadHook(RamAddress address) {
       hook(address);
     }
   }
+}
+
+void IOController::DetachAllHooks() {
+  this->ioWriteHooksTable.clear();
+  this->ioReadHooksTable.clear();
 }
 
 }  // namespace ALinkEmu::AVR
