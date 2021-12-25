@@ -7,6 +7,8 @@
 #include <utility>
 
 #include "Logger.hpp"
+#include "Utils/ArrayBuffer.hpp"
+
 #define EMU_DEBUG_BREAK() raise(SIGABRT)
 
 #define BIND_MEMBER_FUNCTION_TO_CALLBACK(fn) \
