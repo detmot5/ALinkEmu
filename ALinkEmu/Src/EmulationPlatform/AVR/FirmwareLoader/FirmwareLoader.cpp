@@ -20,7 +20,7 @@ FlashImage FirmwareLoader::FromHexFile(std::istream& basicIstream) {
     hexRecord.clear();
     std::getline(basicIstream, hexRecord);
 
-    if (hexRecord.size() > 0) {
+    if (!hexRecord.empty()) {
       if (hexRecord[0] != ':') {
         throw InvalidIntelHexFileFormatException();
       }
@@ -28,7 +28,7 @@ FlashImage FirmwareLoader::FromHexFile(std::istream& basicIstream) {
       IntelHexRecordParser parser(hexRecord);
       uint8_t bytesCount = parser.GetNextByte();
       uint16_t address = parser.GetNextWord();
-      IntelHexRecordType recordType = static_cast<IntelHexRecordType>(parser.GetNextByte());
+      auto recordType = static_cast<IntelHexRecordType>(parser.GetNextByte());
 
       EMU_LOG_INFO("Bytes count {0} Address {1:x} recordType {2}", bytesCount, address, recordType);
       if (address >= INTEL_HEX_AVR_FIRMWARE_START && recordType == IntelHexRecordType::DATA) {
