@@ -112,7 +112,7 @@ class ArrayBuffer {
 
   inline bool IsValid() const { return this->data != nullptr; }
 
-  inline size_t GetSize() { return this->size; }
+  inline size_t GetSize() const { return this->size; }
 
   inline const T& GetElement(size_t index) const {
     if (this->data == nullptr) throw UnallocatedArrayBufferException();
@@ -134,10 +134,15 @@ class ArrayBuffer {
 
   void Memset(const T& value) { this->Memset(value, this->size); }
 
+
   void Memcpy(const T* rawData, size_t limit) {
     if (this->data == nullptr) throw UnallocatedArrayBufferException();
     if (limit > this->size) limit = this->size;
     std::memcpy(this->data, rawData, limit);
+  }
+
+  void Memcpy(const ArrayBuffer<T>& otherArrayBuffer) {
+    this->Memcpy(otherArrayBuffer.data, this->size);
   }
 
   inline const T& operator[](size_t index) const { return this->GetElement(index); }
