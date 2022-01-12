@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
 
+
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -33,6 +34,8 @@ target_link_libraries(ALinkEmu PUBLIC spdlog::spdlog)
 enable_testing()
 
 
+remove_definitions(-DEMU_DEBUG=1)
+add_definitions(-DEMU_DEBUG=0)
 file(GLOB_RECURSE TestSources CONFIGURE_DEPENDS Test/*.cpp)
 add_executable(
         test
