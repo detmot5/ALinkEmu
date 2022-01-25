@@ -1,41 +1,41 @@
 //
-// Created by norbert on 17.11.2021.
+// Created by Norbert Bielak on 17.11.2021.
 //
 
 #include "Core.hpp"
 
-#include <cstring>
-#include <sstream>
-
 #include "Base/Base.hpp"
-#include "EmulationPlatform/AVR/InstructionExecutor/InstructionExecutor.hpp"
+#include "Base/Utils/ArrayBuffer.hpp"
+#include "EmulationPlatform/AVR/Chip/AvrChip.hpp"
 
 namespace ALinkEmu::AVR {
 
 void Core::Init() {
   // 328p memory stats;
-  this->platformDependentData.FLASHEND = 32768;
-  this->platformDependentData.RAMEND = 2048;
+  this->relatedChip.platformData.FLASHEND = 32768;
+  this->relatedChip.platformData.RAMEND = 2048;
 
-  this->state = CpuState::BEFORE_INIT;
-  this->flash = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.FLASHEND + 4]);
-  std::memset(this->flash.get(), 0xFF, this->platformDependentData.FLASHEND + 1);
-  this->codeEnd = this->platformDependentData.FLASHEND;
-  this->ram = std::unique_ptr<uint8_t[]>(new uint8_t[this->platformDependentData.RAMEND + 1]);
-  std::memset(this->ram.get(), 0x00, this->platformDependentData.RAMEND);
+  this->state = CoreState::BEFORE_INIT;
+  this->codeEnd = this->relatedChip.platformData.FLASHEND;
   this->frequency = 10000000;
-  this->instructionExecutor.AttachCore(this);
   this->PC = 0;
 
-  this->ram[0] = 10;
-  this->ram[1] = 10;
+  this->state = CoreState::RUNNING;
 }
 
-void Core::Reset() {}
-void Core::Shutdown() {}
+void Core::Restart() {
+  this->PC = 0;
+}
+
+void Core::Shutdown() {
+  this->PC = 0;
+  this->state = CoreState::STOPPED;
+}
+
 void Core::ExecuteSingleInstruction() {
-  uint32_t opcode = this->FetchInstruction(this->PC);
-  uint32_t newPC = this->PC + 1;
+  auto& programMemory = this->relatedChip.programMemory;
+  uint32_t opcode = programMemory.FetchInstruction(this->PC);
+  uint32_t newPC = this->PC + 2;
 
   switch (opcode & 0xF000) {
     case 0x0000: {
@@ -58,12 +58,45 @@ void Core::ExecuteSingleInstruction() {
               switch (opcode & 0xFF00) {
                 case 0x0100: {
                   this->instructionExecutor.MOVW(opcode);
+                } break;
+                case 0x0200: {
+                  this->instructionExecutor.MULS(opcode);
+                } break;
+                case 0x0300: {
+                  switch (opcode & 0x88) {
+                    case 0x00: {
+                      this->instructionExecutor.MULSU(opcode);
+                    } break;
+                    case 0x08: {
+                      this->instructionExecutor.FMUL(opcode);
+                    } break;
+                    case 0x80: {
+                      this->instructionExecutor.FMULS(opcode);
+                    } break;
+                    case 0x88: {
+                      this->instructionExecutor.FMULSU(opcode);
+                    } break;
+                  }
                 }
               }
           }
         }
       }
-    }
+    } break;
+    case 0x9000: {
+      case 0xB000: {
+        switch (opcode & 0xF800) {
+          case 0xB800: {
+            this->instructionExecutor.OUT(opcode);
+          } break;
+          case 0xB000: {
+            this->instructionExecutor.IN(opcode);
+          } break;
+        }
+      } break;
+    } break;
+    default:
+      EMU_LOG_WARN("Invalid opcode: {0:x}", opcode);
   }
   // After instruction, it should synchronize SREG with sregMirror
 
@@ -71,14 +104,9 @@ void Core::ExecuteSingleInstruction() {
   EMU_LOG_INFO("Instruction executed. Core dump: \n{0}", this->DumpCoreData());
 }
 
-uint32_t Core::FetchInstruction(FlashAddress currentPC) {
-  return this->flash[currentPC] | (this->flash[currentPC + 1] << 8);
-}
 
-void Core::LoadFirmware(uint8_t* data, size_t size) { std::memcpy(this->flash.get(), data, size); }
-
-// Simple way to serialize core registers values (especially SREG) for debugging purposes
 std::string Core::DumpCoreData() {
+  // Simple way to serialize core registers values (especially SREG) for debugging purposes
   std::string sreg = fmt::format("SREG: I = {0} T = {1}  H = {2} S = {3} V = {4} N = {5} Z = {6} C = {7}\n",
                                  this->GetSregFlagValue(SregFlag::I), this->GetSregFlagValue(SregFlag::T),
                                  this->GetSregFlagValue(SregFlag::H), this->GetSregFlagValue(SregFlag::S),
@@ -87,7 +115,7 @@ std::string Core::DumpCoreData() {
 
   std::string generalPurposeRegisters;
   for (uint8_t i = 0; i < 32; i++) {
-    uint8_t reg = this->GetRegisterValue(i);
+    uint8_t reg = this->relatedChip.dataMemory.GetRegisterValue(i);
     generalPurposeRegisters += fmt::format("r{0}={1} ", i, reg);
   }
 

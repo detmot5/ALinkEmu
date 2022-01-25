@@ -9,13 +9,23 @@
 namespace ALinkEmu::AVR {
 
 struct AddressingModeDecoder {
-  static inline uint8_t DecodeRd5(uint32_t opcode) { return (opcode >> 4) & 0xf; }
+  static inline uint8_t DecodeRd5(uint32_t opcode) { return (opcode >> 4) & 0x0F; }
 
   // Standard addressing mode for instructions which performs operations on two registers like ADD or CPC
   static inline std::pair<uint8_t, uint8_t> DecodeRr5Rd5(uint32_t opcode) {
     uint8_t RrAddress5 = ((opcode >> 5) & 0x10) | (opcode & 0x0F);
     uint8_t RdAddress5 = (opcode >> 4) & 0x1F;
     return {RrAddress5, RdAddress5};
+  }
+
+  // Standard direct IO addressing mode
+  // xxxx xAAr rrrr AAAA
+  // where "r" stands for register which is used to perform operation
+  // and "A" means address of IO register assigned to particular IO device
+  static inline std::pair<uint8_t, uint8_t> DecodeR5A6(uint32_t opcode) {
+    uint8_t registerAddress = (opcode >> 4) & 0x1F;
+    uint8_t ioAddress = ((((opcode >> 9) & 3) << 4) | (opcode & 0x0F)) + 32;
+    return {registerAddress, ioAddress};
   }
 
   /*
@@ -29,10 +39,22 @@ struct AddressingModeDecoder {
    * Register name must be even because after single right bit shift we can store its value on 4 bits
    * (AVR general purpose registers can be stored in 5 bit values (r0 - r31))
    */
-  static inline std::pair<uint8_t, uint8_t> DecodeRr4Rd4(uint32_t opcode) {
+  static inline std::pair<uint8_t, uint8_t> DecodeForMOVW(uint32_t opcode) {
     uint8_t RrAddress4 = (opcode & 0x0F) << 1;
     uint8_t RdAddress4 = ((opcode >> 4) & 0x0F) << 1;
     return {RrAddress4, RdAddress4};
+  }
+
+  static inline std::pair<uint8_t, uint8_t> DecodeForMULS(uint32_t opcode) {
+    uint8_t RrAddress = 16 + (opcode & 0x0F);
+    uint8_t RdAddress = 16 + ((opcode >> 4) & 0x0F);
+    return {RrAddress, RdAddress};
+  }
+
+  static inline std::pair<uint8_t, uint8_t> DecodeForMUL(uint32_t opcode) {
+    uint8_t RrAddress = 16 + (opcode & 0x7);
+    uint8_t RdAddress = 16 + ((opcode >> 4) & 0x7);
+    return {RrAddress, RdAddress};
   }
 };
 

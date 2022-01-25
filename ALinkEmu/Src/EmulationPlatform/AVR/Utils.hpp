@@ -3,7 +3,7 @@
 //
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace ALinkEmu::AVR {
 
@@ -26,4 +26,4 @@ enum class SregFlag : uint8_t {
   I = 7,
 };
 
-}
+}  // namespace ALinkEmu::AVR
