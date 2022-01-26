@@ -50,4 +50,7 @@ struct AvrChip {
   std::vector<std::unique_ptr<IODevice>> ioDevices;
 };
 
+
+using AvrChipRef = AvrChip&;
+
 }  // namespace ALinkEmu::AVR
