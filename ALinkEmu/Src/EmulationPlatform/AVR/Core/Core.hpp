@@ -25,13 +25,13 @@ class Core {
   friend class InstructionExecutor;
 
  public:
+  // TODO: Clang-Tidy: Constructor does not initialize these fields: state, PC, codeEnd, frequency
   explicit Core(AvrChip& relatedChip) : instructionExecutor(this), relatedChip(relatedChip) {}
 
   void Init();
   void Restart();
   void Shutdown();
   void ExecuteSingleInstruction();
-
 
   inline bool GetSregFlagValue(SregFlag flag) { return this->sregMirror[static_cast<size_t>(flag)]; }
   inline void SetSregFlagValue(SregFlag flag, bool value) {
@@ -49,10 +49,9 @@ class Core {
   AvrChip& relatedChip;
   std::string name;
   CoreState state;
-  FlashAddress PC; // Program Counter
+  FlashAddress PC;  // Program Counter
   uint32_t codeEnd;
   uint32_t frequency;
-
 
   struct MicrocontrollerStatusRegister {
     // Power On Restart Flag
