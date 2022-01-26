@@ -31,11 +31,11 @@ target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(ALinkEmu PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
 target_link_libraries(ALinkEmu PUBLIC spdlog::spdlog)
 
+target_compile_definitions(ALinkEmu PUBLIC -DEMU_DEBUG=1)
+
 enable_testing()
 
 
-remove_definitions(-DEMU_DEBUG=1)
-add_definitions(-DEMU_DEBUG=0)
 file(GLOB_RECURSE TestSources CONFIGURE_DEPENDS Test/*.cpp)
 add_executable(
         test
@@ -48,6 +48,7 @@ target_link_libraries(
         ALinkEmu
 
 )
+target_compile_definitions(test PUBLIC EMU_DEBUG=0)
 
 target_include_directories(test PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Src)
 
