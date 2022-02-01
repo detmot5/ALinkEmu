@@ -83,6 +83,15 @@ void Core::ExecuteSingleInstruction() {
         }
       }
     } break;
+
+    case 0x1000: {
+      switch(opcode & 0xfc00) {
+        case 0x1800: {
+          this->instructionExecutor.SUB(opcode);
+        }
+      }
+    }
+
     case 0x9000: {
       case 0xB000: {
         switch (opcode & 0xF800) {

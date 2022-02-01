@@ -198,6 +198,34 @@ void InstructionExecutor::FMULSU(uint32_t opcode) {
   this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
 }
 
+// performs multiplication and shift one bit to the left
+void InstructionExecutor::SUB(uint32_t opcode) {
+  auto [RrAddress, RdAddress] = AddressingModeDecoder::DecodeRr5Rd5(opcode);
+  auto& memory = this->coreRef->relatedChip.dataMemory;
+  uint8_t Rr = memory.GetRegisterValue(RrAddress);
+  uint8_t Rd = memory.GetRegisterValue(RdAddress);
+
+  uint16_t result = Rd - Rr;
+
+  memory.SetRegisterValue(RdAddress, result);
+
+  this->coreRef->SetSregFlagValue(SregFlag::Z, result == 0);
+  this->coreRef->SetSregFlagValue(SregFlag::N, (result >> 7) & 0x01);
+
+  uint8_t carryFlagsCondition = (~Rd & Rr) | (Rr & result) | (result & ~Rd);
+  uint8_t carry = carryFlagsCondition >> 7;
+  uint8_t halfCarry = carryFlagsCondition >> 3;
+  this->coreRef->SetSregFlagValue(SregFlag::C, carry & 0x01);
+  this->coreRef->SetSregFlagValue(SregFlag::H, halfCarry & 0x01);
+
+  uint8_t twosComplementOverflowFlagCondition = (((Rd & ~Rr & result) | (~Rd & Rr & result)) >> 7) & 0x01;
+  this->coreRef->SetSregFlagValue(SregFlag::V, twosComplementOverflowFlagCondition);
+
+  uint8_t N = this->coreRef->GetSregFlagValue(SregFlag::N);
+  uint8_t V = this->coreRef->GetSregFlagValue(SregFlag::V);
+  this->coreRef->SetSregFlagValue(SregFlag::S, N ^ V);
+}
+
 void InstructionExecutor::OUT(uint32_t opcode) {
   auto [RrAddress, ioAddress] = AddressingModeDecoder::DecodeR5A6(opcode);
   auto& memory = this->coreRef->relatedChip.dataMemory;

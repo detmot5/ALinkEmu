@@ -35,6 +35,8 @@ public:
   void FMULS(uint32_t opcode);
   // Fractional Multiply Signed With Unsigned
   void FMULSU(uint32_t opcode);
+  // Subtract without carry 
+  void SUB(uint32_t opcode);
 
   // OUT - Write to IO space
   void OUT(uint32_t opcode);
